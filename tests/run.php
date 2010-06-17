@@ -61,6 +61,12 @@ $dispatched = dispatch('/fuga');
 $t->is($dispatched['action'], 'piyo', '"/fuga"のアクション名は"piyo"');
 $t->is($dispatched['method'], 'fuga', '"/fuga"のメソッド名は"fuga"');
 
+register_dispatch('/xxx', array(
+  '/hoge' => array('action' => 'hoge', 'method' => 'index')
+));
+$dispatched = dispatch('/xxx/hoge');
+$t->is($dispatched['action'], 'hoge', '"/xxx/hoge"のアクション名は"hoge"');
+$t->is($dispatched['method'], 'index', '"/xxx/hoge"のメソッド名は"index"');
 
 $t->diag('function url_for test');
 $t->is(url_for('/hoge'), '/hoge', 'returns /hoge');

@@ -125,7 +125,7 @@ function Pikotan_validate_not_null($val = false)
 
 function Pikotan_validate_ascii($val = '')
 {
-  return preg_match('/^[a-z0-9]*$/i', $val);
+  return preg_match('/^[a-zA-Z0-9]*$/i', $val);
 }
 
 function Pikotan_validate_numeric($val = false)
@@ -143,12 +143,32 @@ function Pikotan_validate_length($val = '', $min = 0, $max = false)
 
 function Pikotan_validate_regex($val = '', $r = '/^(.+?)$/')
 {
-  return preg_match($r, $val);
+  $c = preg_match($r, $val);
+  return !empty($c);
 }
 
 function Pikotan_validate_in_list($val = '', $l = array())
 {
-  return in_array($val, $l);
+  $exists = false;
+  foreach ($l as $v) {
+    if ($v == $val) {
+      $exists = true;
+      break;
+    }
+  }
+  return $exists;
+}
+
+function Pikotan_validate_mail($mail = '')
+{
+  //from Mail_RFC822::isValidInetAddress()
+  $regex = '/^([*+!.&#$|\'%\/0-9a-z^_`{}=?~-]+)@(([0-9a-z-]+\.)+[0-9a-z]{2,})$/i';
+  return (preg_match($regex, trim($mail)))? true : false;
+}
+
+function Pikotan_validate_phone($val = '')
+{
+  return !!preg_match('/^0(\d{1,3})-(\d{2,4})-(\d{3,4})$/', $val);
 }
 
 function validate($conditions = array())
@@ -206,8 +226,12 @@ if (!defined('PIKOTAN_UTILITY_USE') || !PIKOTAN_UTILITY_USE) {
 
   // <!-- dispatcher
   $pikotan_dispatcher_table = array();
-  function register_dispatch($table)
+  function register_dispatch($prefix, $table = array())
   {
+    if (empty($table) && is_array($prefix)) {
+      $table = $prefix;
+      $prefix = '';
+    }
     if (!is_array($table)) {
       return;
     }
@@ -233,7 +257,7 @@ if (!defined('PIKOTAN_UTILITY_USE') || !PIKOTAN_UTILITY_USE) {
         }
         $val[$i] = $v;
       }
-      $pikotan_dispatcher_table[$path] = $val;
+      $pikotan_dispatcher_table[$prefix.$path] = $val;
     }
   }
 
